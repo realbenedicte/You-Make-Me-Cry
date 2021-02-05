@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Playground</title>
+</head>
+<body>
+    <p id="socket-status">Disconnected</p>
+    <form>
+        <input id="drip-rate-control" type="range" name="rate" min="1" max="10">
+        <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output>
+    </form>
+
+    <p>Socket Output: </p>
+    <p id="socket-output"></p>
+</body>
+<script>
+// Websocket server connection
+let socketOutput = document.getElementById("socket-output")
+let socketStatus = document.getElementById("socket-status")
+const ws = new WebSocket('ws://localhost:8000/');
+ws.onopen = function() {
+    console.log('WebSocket Client Connected');
+    ws.send('Hi this is web client.');
+    socketStatus.innerHTML = "Connected."
+};
+ws.onclose = function() {
+    socketStatus.innerHTML = "Disconnected."
+}
+ws.onmessage = function(e) {
+  console.log("Received: '" + e.data + "'");
+  socketOutput.innerHTML = e.data + "</br>"+ socketOutput.innerHTML
+};
+
+// Website UI logic
+let rateController = document.getElementById("drip-rate-control")
+let rateLabel = document.getElementById("drip-rate-label")
+rateController.addEventListener("input", (evt) => {
+    console.log("got evt ! ", evt.target.value)
+    rateLabel.innerHTML = evt.target.value
+    ws.send(evt.target.value);
+});
+</script>
+</html>
