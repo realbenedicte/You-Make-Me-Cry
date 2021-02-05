@@ -1,23 +1,24 @@
-var WebSocketServer = require("ws").Server
-var http = require("http")
-var express = require("express")
-var app = express()
-var port = process.env.PORT || 8000
+const WebSocket = require('ws')
+const WebSocketServer = require("ws").Server
+const http = require("http")
+const express = require("express")
+const app = express()
+const port = process.env.PORT || 8000
 
 app.use(express.static(__dirname + "/"))
 
-var server = http.createServer(app)
+const server = http.createServer(app)
 server.listen(port)
 console.log("http server listening on %d", port)
 
-var wss = new WebSocketServer({ server: server })
+const wss = new WebSocketServer({ server: server })
 console.log("websocket server created")
 
 // get websocket connection
 wss.on("connection", function (ws) {
-  var id = setInterval(function () {
+  let id = setInterval(function () {
     console.log("send ping: C")
-    ws.send("C", function () {})
+    ws.send("PING", function () {})
   }, 12000)
   console.log("websocket connection open ")
 
@@ -33,7 +34,9 @@ wss.on("connection", function (ws) {
 
   wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
-      client.send(data)
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
     })
   }
 })

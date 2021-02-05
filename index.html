@@ -6,18 +6,25 @@
 <body>
     <p id="socket-status">Disconnected</p>
     <form>
-        <input id="drip-rate-control" type="range" name="rate" min="1" max="10">
+        <input id="drip-rate-control" type="range" name="rate" min="1" max="20">
         <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output>
     </form>
-
+    <button id="drip-toggle">OFF</button> 
     <p>Socket Output: </p>
     <p id="socket-output"></p>
 </body>
 <script>
+
+// Rate controller elements
+let rateController = document.getElementById("drip-rate-control")
+let rateLabel = document.getElementById("drip-rate-label")
+let dripToggle = document.getElementById("drip-toggle")
+
 // Websocket server connection
 let socketOutput = document.getElementById("socket-output")
 let socketStatus = document.getElementById("socket-status")
-const ws = new WebSocket('ws://localhost:8000/');
+
+const ws = new WebSocket('ws://lethe.wtf:8000/');
 ws.onopen = function() {
     console.log('WebSocket Client Connected');
     ws.send('Hi this is web client.');
@@ -28,16 +35,31 @@ ws.onclose = function() {
 }
 ws.onmessage = function(e) {
   console.log("Received: '" + e.data + "'");
-  socketOutput.innerHTML = e.data + "</br>"+ socketOutput.innerHTML
+  if (e.data.startsWith("R")) {
+      let value = e.data.split(',')[1]
+      console.log("got rate value: ", value)
+      rateController.value = value
+      rateLabel.innerHTML = value
+  }
+  if (e.data !== "PING") {
+    socketOutput.innerHTML = e.data
+  }
 };
-
-// Website UI logic
-let rateController = document.getElementById("drip-rate-control")
-let rateLabel = document.getElementById("drip-rate-label")
+// Drip rate controller event listener
 rateController.addEventListener("input", (evt) => {
     console.log("got evt ! ", evt.target.value)
     rateLabel.innerHTML = evt.target.value
-    ws.send(evt.target.value);
+    ws.send(`R,${evt.target.value}`);
 });
+
+dripToggle.addEventListener("click", (evt) => {
+  if (dripToggle.innerText == "OFF") {
+    dripToggle.innerText = "ON"
+    ws.send(`T,1`);
+  } else {
+    dripToggle.innerText = "OFF"
+    ws.send(`T,0`);
+  }
+})
 </script>
 </html>
