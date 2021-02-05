@@ -1,12 +1,20 @@
 const WebSocket = require('ws')
+const fs = require('fs');
 const WebSocketServer = require("ws").Server
+const https = require("https")
 const http = require("http")
 const express = require("express")
 const app = express()
 const port = process.env.PORT || 8000
-
 app.use(express.static(__dirname + "/"))
 
+// const options = {
+//   hostname: 'youmakemecry.com',
+//   key: fs.readFileSync('/etc/letsencrypt/live/youmakemecry.com/privkey.pem'),
+//   cert: fs.readFileSync('/etc/letsencrypt/live/youmakemecry.com/cert.pem')
+// };
+
+//const server = https.createServer(options, app)
 const server = http.createServer(app)
 server.listen(port)
 console.log("http server listening on %d", port)

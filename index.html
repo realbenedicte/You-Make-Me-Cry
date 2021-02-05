@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebSocket Playground</title>
+  <title>You Make Me Cry</title>
 </head>
 <body>
     <p id="socket-status">Disconnected</p>
@@ -9,7 +9,7 @@
         <input id="drip-rate-control" type="range" name="rate" min="1" max="20">
         <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output>
     </form>
-    <button id="drip-toggle">OFF</button> 
+    <button id="drip-toggle">OFF</button>
     <p>Socket Output: </p>
     <p id="socket-output"></p>
 </body>
@@ -24,7 +24,8 @@ let dripToggle = document.getElementById("drip-toggle")
 let socketOutput = document.getElementById("socket-output")
 let socketStatus = document.getElementById("socket-status")
 
-const ws = new WebSocket('ws://lethe.wtf:8000/');
+//const ws = new WebSocket('wss://youmakemecry.com:8000/');
+const ws = new WebSocket('ws://localhost:8000/');
 ws.onopen = function() {
     console.log('WebSocket Client Connected');
     ws.send('Hi this is web client.');

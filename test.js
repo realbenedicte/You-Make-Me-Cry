@@ -1,3 +1,6 @@
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 const port = new SerialPort('/dev/tty.usbmodem14101', { baudRate: 9600 });
@@ -5,7 +8,9 @@ const parser = port.pipe(new Readline({ delimiter: '\n' }));// Read the port dat
 
 const WebSocket = require('ws');
 
-const ws = new WebSocket('ws://lethe.wtf:8000');
+
+//const ws = new WebSocket('wss://youmakemecry.com:8000/');
+const ws = new WebSocket('ws://localhost:8000/');
 
 ws.on('open', function open() {
   console.log('connected');
@@ -17,7 +22,7 @@ ws.on('close', function close() {
 });
 
 ws.on('message', function incoming(data) {
-  
+
     console.log(data);
     if (data.startsWith('R')){
     	let val =data.split(",")[1];
