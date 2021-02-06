@@ -11,16 +11,15 @@
 <body>
   <p id="title-of-page"> You Make Me Cry </p>
   <p id="information"> A web performance by Maxime Gordon </p>
-  <p id="information-two"> Control the artist's tears: </p>
-  <button id="drip-toggle">OFF</button>
+  <p id="information-two"> You control the artist's tears: </p>
+  <button disabled id="drip-toggle">OFF</button>
   <form>
-    <input id="drip-rate-control" type="range" name="rate" min="1" max="20">
-    <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output>
+    <input disabled id="drip-rate-control" type="range" name="rate" min="1" max="20">
+    <!-- <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output> -->
   </form>
   <p id="socket-status">Disconnected</p>
-
-
-
+  <p id="arduino-status">Arduino: Disconnected</p>
+  <!-- <div id="feedback"> </div> -->
   <p>Socket Output: </p>
   <p id="socket-output"></p>
   <img src="/assets/drop.png" alt="tears">
@@ -31,51 +30,87 @@
 <script>
   // Rate controller elements
   let rateController = document.getElementById("drip-rate-control")
-  let rateLabel = document.getElementById("drip-rate-label")
+  let dripFeedback = document.getElementById("feedback")
+  let feedbackState;
   let dripToggle = document.getElementById("drip-toggle")
 
   // Websocket server connection
   let socketOutput = document.getElementById("socket-output")
   let socketStatus = document.getElementById("socket-status")
-
+  let arduinoStatus = document.getElementById("arduino-status")
   //const ws = new WebSocket('wss://youmakemecry.com:8000/');
   const ws = new WebSocket('ws://localhost:8000/');
   ws.onopen = function() {
     console.log('WebSocket Client Connected');
     ws.send('Hi this is web client.');
-    socketStatus.innerHTML = "Connected."
+    socketStatus.innerHTML = "Connected To Server."
   };
   ws.onclose = function() {
     socketStatus.innerHTML = "Disconnected."
+    rateController.disabled = true;
+    dripToggle.disabled = true;
   }
   ws.onmessage = function(e) {
     console.log("Received: '" + e.data + "'");
-    if (e.data.startsWith("R")) {
+
+  if (e.data.startsWith("R")) {
       let value = e.data.split(',')[1]
       console.log("got rate value: ", value)
       rateController.value = value
-      rateLabel.innerHTML = value
+      updateFeedback(value);
+      // rateLabel.innerHTML = value
+    } else if (e.data.startsWith("T")) {
+      let value = e.data.split(',')[1];
+      if (value === '0') {
+        dripToggle.innerText = "OFF"
+        rateController.disabled = true;
+      } else if (value === '1') {
+        dripToggle.innerText = "ON"
+        rateController.disabled = false;
+      }
+    } else if (e.data === "XX") {
+      dripToggle.disabled = false;
+      arduinoStatus.innerHTML = "Arduino: Connected"
+    } else if (e.data === "XY") {
+      rateController.disabled = true;
+      dripToggle.disabled = true;
+      arduinoStatus.innerHTML = "Arduino: Disconnected"
     }
     if (e.data !== "PING") {
       socketOutput.innerHTML = e.data
     }
+
   };
   // Drip rate controller event listener
   rateController.addEventListener("input", (evt) => {
     console.log("got evt ! ", evt.target.value)
-    rateLabel.innerHTML = evt.target.value
+    // rateLabel.innerHTML = evt.target.value
     ws.send(`R,${evt.target.value}`);
+    updateFeedback(evt.target.value);
   });
 
   dripToggle.addEventListener("click", (evt) => {
     if (dripToggle.innerText == "OFF") {
       dripToggle.innerText = "ON"
       ws.send(`T,1`);
+      rateController.disabled = false;
     } else {
       dripToggle.innerText = "OFF"
       ws.send(`T,0`);
+      rateController.disabled = true;
     }
   })
+
+  function updateFeedback(val) {
+    if (val <= 25 && feedbackState !== 'low') {
+      dripFeedback.setAttribute('class', 'low');
+      feedbackStatus = 'low';
+    } else if (val > 25 && feedbackState !== 'high') {
+      dripFeedback.setAttribute('class', 'high');
+      feedbackStatus = 'high';
+    }
+
+  }
 </script>
 
 </html>

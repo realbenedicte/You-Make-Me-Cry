@@ -18,6 +18,11 @@ body {
     font-size: 80px;
     margin-bottom: 0px;
     margin-top: 10px;
+    /* text-shadow: 0 0 10px #0f53ff; */
+}
+
+button{
+  box-shadow: 0 0px 15px #0f53ff;
 }
 
 #information{
@@ -25,9 +30,11 @@ font-size: 25px;
 margin-top: 5px;
 margin-bottom: 5px;
 }
+
 #information-two{
   margin-top: 5px;
   margin-bottom: 20px;
+   text-decoration: underline;
 }
 #socket-status{
 margin-top: 10px;
@@ -37,6 +44,21 @@ img{
   width: 12%;
 }
 
+
 form {
 margin-top: 10px;
+}
+
+#feedback{
+  width: 100px;
+  height:100px;
+  background-color: blue;
+}
+
+#feedback.low{
+  background-color: lightblue;
+}
+
+#feedback.high{
+background-color: darkblue;
 }
