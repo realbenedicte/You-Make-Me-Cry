@@ -1,0 +1,42 @@
+@font-face {
+    font-family: 'lapicidelight';
+    src: url('lapicide-light-webfont.woff2') format('woff2'),
+         url('lapicide-light-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+  font-family:'lapicidelight';
+  text-align: center;
+  background-color: white;
+}
+
+#title-of-page{
+    font-family: 'lapicidelight';
+    font-size: 80px;
+    margin-bottom: 0px;
+    margin-top: 10px;
+}
+
+#information{
+font-size: 25px;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#information-two{
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+#socket-status{
+margin-top: 10px;
+}
+
+img{
+  width: 12%;
+}
+
+form {
+margin-top: 10px;
+}

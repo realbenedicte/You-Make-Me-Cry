@@ -1,66 +1,81 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
   <title>You Make Me Cry</title>
+  <!-- CSS stylesheet(s) -->
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
+
 <body>
-    <p id="socket-status">Disconnected</p>
-    <form>
-        <input id="drip-rate-control" type="range" name="rate" min="1" max="20">
-        <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output>
-    </form>
-    <button id="drip-toggle">OFF</button>
-    <p>Socket Output: </p>
-    <p id="socket-output"></p>
+  <p id="title-of-page"> You Make Me Cry </p>
+  <p id="information"> A web performance by Maxime Gordon </p>
+  <p id="information-two"> Control the artist's tears: </p>
+  <button id="drip-toggle">OFF</button>
+  <form>
+    <input id="drip-rate-control" type="range" name="rate" min="1" max="20">
+    <output id="drip-rate-label" for="rate" onforminput="value = rate.valueAsNumber"></output>
+  </form>
+  <p id="socket-status">Disconnected</p>
+
+
+
+  <p>Socket Output: </p>
+  <p id="socket-output"></p>
+  <img src="/assets/drop.png" alt="tears">
+  <img src="/assets/drop.png" alt="tears">
+  <img src="/assets/drop.png" alt="tears">
+  <img src="/assets/drop.png" alt="tears">
 </body>
 <script>
+  // Rate controller elements
+  let rateController = document.getElementById("drip-rate-control")
+  let rateLabel = document.getElementById("drip-rate-label")
+  let dripToggle = document.getElementById("drip-toggle")
 
-// Rate controller elements
-let rateController = document.getElementById("drip-rate-control")
-let rateLabel = document.getElementById("drip-rate-label")
-let dripToggle = document.getElementById("drip-toggle")
+  // Websocket server connection
+  let socketOutput = document.getElementById("socket-output")
+  let socketStatus = document.getElementById("socket-status")
 
-// Websocket server connection
-let socketOutput = document.getElementById("socket-output")
-let socketStatus = document.getElementById("socket-status")
-
-//const ws = new WebSocket('wss://youmakemecry.com:8000/');
-const ws = new WebSocket('ws://localhost:8000/');
-ws.onopen = function() {
+  //const ws = new WebSocket('wss://youmakemecry.com:8000/');
+  const ws = new WebSocket('ws://localhost:8000/');
+  ws.onopen = function() {
     console.log('WebSocket Client Connected');
     ws.send('Hi this is web client.');
     socketStatus.innerHTML = "Connected."
-};
-ws.onclose = function() {
+  };
+  ws.onclose = function() {
     socketStatus.innerHTML = "Disconnected."
-}
-ws.onmessage = function(e) {
-  console.log("Received: '" + e.data + "'");
-  if (e.data.startsWith("R")) {
+  }
+  ws.onmessage = function(e) {
+    console.log("Received: '" + e.data + "'");
+    if (e.data.startsWith("R")) {
       let value = e.data.split(',')[1]
       console.log("got rate value: ", value)
       rateController.value = value
       rateLabel.innerHTML = value
-  }
-  if (e.data !== "PING") {
-    socketOutput.innerHTML = e.data
-  }
-};
-// Drip rate controller event listener
-rateController.addEventListener("input", (evt) => {
+    }
+    if (e.data !== "PING") {
+      socketOutput.innerHTML = e.data
+    }
+  };
+  // Drip rate controller event listener
+  rateController.addEventListener("input", (evt) => {
     console.log("got evt ! ", evt.target.value)
     rateLabel.innerHTML = evt.target.value
     ws.send(`R,${evt.target.value}`);
-});
+  });
 
-dripToggle.addEventListener("click", (evt) => {
-  if (dripToggle.innerText == "OFF") {
-    dripToggle.innerText = "ON"
-    ws.send(`T,1`);
-  } else {
-    dripToggle.innerText = "OFF"
-    ws.send(`T,0`);
-  }
-})
+  dripToggle.addEventListener("click", (evt) => {
+    if (dripToggle.innerText == "OFF") {
+      dripToggle.innerText = "ON"
+      ws.send(`T,1`);
+    } else {
+      dripToggle.innerText = "OFF"
+      ws.send(`T,0`);
+    }
+  })
 </script>
+
 </html>
